@@ -2,7 +2,7 @@ import logging
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 
 from app.config import get_settings
 from app.controllers.file_controller import router
@@ -14,9 +14,14 @@ app = FastAPI(title=get_settings().app_name, version="1.0.0", description="Secur
 app.include_router(router)
 
 
+@app.get("/", include_in_schema=False)
+def root() -> RedirectResponse:
+    return RedirectResponse(url="/docs")
+
 @app.get("/health", response_model=HealthResponse, summary="Check application availability")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
 
 
 @app.exception_handler(ApplicationError)
